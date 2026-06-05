@@ -1,0 +1,283 @@
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𝙎𝙛𝙩𝙢(𝙊𝙬𝙣𝙚𝙧 𝙍𝙖𝙟 -𝙏𝙧𝙖𝙙𝙚𝙧)</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Orbitron:wght@400;900&family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --dark-bg: #050505;
+            --card-bg: #0d0d0d;
+            --gold: #ffd700;
+            --neon-red: #ff3131;
+            --blue: #0088cc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', sans-serif; }
+        body { background-color: var(--dark-bg); color: #fff; overflow-x: hidden; }
+
+        /* পাসওয়ার্ড লকের স্টাইল */
+        #password-lock {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98);
+            z-index: 10001; display: flex; align-items: center; justify-content: center;
+            padding: 20px; backdrop-filter: blur(15px);
+        }
+        .pass-content {
+            background: #000; border: 2px solid var(--matrix-green); padding: 40px 25px;
+            border-radius: 20px; max-width: 400px; text-align: center;
+        }
+        .pass-content i { font-size: 50px; color: var(--gold); margin-bottom: 20px; }
+        .pass-content h2 { font-family: 'Hind Siliguri'; color: var(--matrix-green); margin-bottom: 20px; }
+        .pass-input {
+            width: 100%; padding: 12px; background: #111; border: 1px solid #333;
+            color: var(--matrix-green); font-size: 18px; text-align: center;
+            border-radius: 8px; margin-bottom: 20px; outline: none;
+        }
+        .pass-btn {
+            background: var(--matrix-green); color: #000; border: none;
+            padding: 12px 25px; font-weight: bold; border-radius: 8px;
+            cursor: pointer; font-size: 16px; width: 100%;
+        }
+        .error-msg { color: var(--neon-red); margin-top: 15px; font-size: 14px; }
+
+        /* মূল কন্টেন্ট (প্রথমে লুকানো) */
+        #main-content { display: none; }
+        
+        /* UI উপাদান */
+        .header { padding: 25px 15px; text-align: center; border-bottom: 1px solid #1a1a1a; background: #000; }
+        .header .brand { font-size: 10px; color: var(--gold); letter-spacing: 5px; font-weight: bold; margin-bottom: 8px; display: block; }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 22px; color: var(--matrix-green); text-shadow: 0 0 10px var(--matrix-green); }
+        .container { max-width: 480px; margin: 0 auto; padding: 10px 15px; }
+        
+        .stats-panel { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .s-card { background: var(--card-bg); padding: 12px; border-radius: 12px; border: 1px solid #222; text-align: center; }
+        .s-label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        .s-val { font-size: 18px; font-weight: 800; color: var(--matrix-green); font-family: 'Orbitron'; }
+        
+        .matrix-card {
+            background: var(--card-bg); border: 1px solid #222; border-radius: 25px;
+            padding: 30px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .period-val { color: var(--matrix-green); font-weight: 800; font-size: 16px; }
+        .timer-val { font-family: 'Orbitron', sans-serif; font-size: 45px; color: #fff; margin: 10px 0; text-shadow: 0 0 10px var(--matrix-green); }
+        .ai-status { font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; font-weight: 700; }
+        .result-text { font-size: 50px; font-weight: 900; font-family: 'Orbitron', sans-serif; margin: 5px 0; color: #fff; }
+        .num-row { display: flex; justify-content: center; gap: 12px; margin-top: 15px; }
+        .num-slot { width: 45px; height: 45px; border: 1px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: var(--matrix-green); }
+        .tg-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: var(--blue); color: #fff; text-decoration: none; padding: 15px;
+            border-radius: 12px; font-weight: 800; margin: 15px 0; font-size: 15px;
+        }
+        
+        /* হিস্ট্রি টেবিল (ANALYSIS LOGS) */
+        .history-panel {
+            background: #000; border-radius: 15px; padding: 15px;
+            border: 1px solid #111; margin-top: 20px;
+        }
+        .history-panel h3 {
+            font-size: 12px; color: var(--gold); text-transform: uppercase;
+            margin-bottom: 12px; letter-spacing: 1px;
+        }
+        .history-table {
+            width: 100%; border-collapse: collapse;
+        }
+        .history-table th {
+            font-size: 10px; color: #555; text-align: left;
+            padding: 8px; border-bottom: 1px solid #222;
+        }
+        .history-table td {
+            padding: 10px 8px; font-size: 12px; border-bottom: 1px solid #111;
+        }
+        .status-win { color: var(--matrix-green); font-weight: bold; }
+        .status-num-win { color: var(--gold); font-weight: bold; }
+        .status-loss { color: var(--neon-red); }
+    </style>
+</head>
+<body>
+
+<!-- পাসওয়ার্ড লক ডিভাইস -->
+<div id="password-lock">
+    <div class="pass-content">
+        <i class="fa-solid fa-lock"></i>
+        <h2>🔐 𝙎𝙛𝙩𝙢(𝙊𝙬𝙣𝙚𝙧 𝙍𝙖𝙟 -𝙏𝙧𝙖𝙙𝙚𝙧)</h2>
+        <input type="password" id="pass-input" class="pass-input" placeholder="পাসওয়ার্ড দিন" autofocus>
+        <button id="unlock-btn" class="pass-btn">ভেরিফাই করুন</button>
+        <div id="pass-error" class="error-msg"></div>
+    </div>
+</div>
+
+<!-- মূল কন্টেন্ট (পাসওয়ার্ড সফল হলে দেখাবে) -->
+<div id="main-content">
+    <div class="header">
+        <span class="brand">𝐁.𝐃.𝐓 -- 𝐒𝐟𝐭𝐦 𝗛𝗚𝗡𝗜𝗖 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐂𝐨𝐦𝐦𝐮𝐧𝐢𝐭𝐲</span>
+        <h1>𝙎𝙛𝙩𝙢(𝙊𝙬𝙣𝙚𝙧 𝙍𝙖𝙟 -𝙏𝙧𝙖𝙙𝙚𝙧)<span style="font-size:12px; color:var(--neon-red);">30S</span></h1>
+    </div>
+    <div class="container">
+        <!-- স্ট্যাটস প্যানেল -->
+        <div class="stats-panel">
+            <div class="s-card"><div class="s-label">Total Win</div><div class="s-val" id="total-win">0</div></div>
+            <div class="s-card"><div class="s-label">Total Loss</div><div class="s-val" id="total-loss" style="color:var(--neon-red)">0</div></div>
+            <div class="s-card"><div class="s-label">Win Rate</div><div class="s-val" id="win-rate" style="color:var(--gold)">0%</div></div>
+        </div>
+        
+        <!-- এআই কার্ড -->
+        <div class="matrix-card">
+            <div style="font-size: 11px; color: #555;">PERIOD: <span class="period-val" id="period-display">----</span></div>
+            <div class="timer-val" id="timer-val">00:30</div>
+            <div class="ai-status">◢ AI OPPORTUNITY SUGGESTION ◣</div>
+            <div class="result-text" id="ai-res">...</div>
+            <div class="num-row" id="num-row">
+                <div class="num-slot">?</div>
+                <div class="num-slot">?</div>
+            </div>
+            <div style="font-size:9px; color:#444; margin-top:10px;">*Opposite Hedge System Active*</div>
+        </div>
+        
+        <a href="https://t.me/B_D_T_HGNICE_Official_Community" class="tg-btn">
+            <i class="fab fa-telegram"></i> JOIN TELEGRAM CHANNEL
+        </a>
+        
+        <!-- ANALYSIS LOGS টেবিল -->
+        <div class="history-panel">
+            <h3><i class="fas fa-chart-line"></i> ANALYSIS LOGS</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>PERIOD</th>
+                        <th>RESULT</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- পাসওয়ার্ড সিস্টেম ----------
+    const CORRECT_PASS = "Owner_Raj_Trader206k";
+    
+    function unlockApp() {
+        const inputField = document.getElementById('pass-input');
+        const enteredPass = inputField.value;
+        const errorDiv = document.getElementById('pass-error');
+        
+        if (enteredPass === CORRECT_PASS) {
+            document.getElementById('password-lock').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            startApp(); // মূল অ্যাপ চালু করুন
+        } else {
+            errorDiv.innerText = 'ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।';
+            inputField.value = '';
+            inputField.focus();
+        }
+    }
+    
+    document.getElementById('pass-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') unlockApp();
+    });
+    document.getElementById('unlock-btn').addEventListener('click', unlockApp);
+    
+    // ---------- মূল অ্যাপ্লিকেশন লজিক (কোনো বিজ্ঞাপন নেই) ----------
+    function startApp() {
+        let totalWins = 0, totalLoss = 0, lastP = "", currentP = null;
+        
+        // প্রেডিকশন ফাংশন
+        function getPrediction(list) {
+            const weights = [8, 5, 3, 2, 1];
+            let score = 0;
+            list.slice(0, 5).forEach((item, i) => {
+                if (parseInt(item.number) >= 5) score += weights[i];
+                else score -= weights[i];
+            });
+            const side = score >= 0 ? "BIG" : "SMALL";
+            let nums = (side === "BIG") ? [1, 3] : [6, 8];
+            return { side, nums };
+        }
+        
+        // রেজাল্ট প্রসেস করে টেবিল ও স্ট্যাটস আপডেট
+        function processResult(latest, pred) {
+            const actNum = parseInt(latest.number);
+            const actSide = actNum >= 5 ? "BIG" : "SMALL";
+            const isSizeWin = (pred.side === actSide);
+            const isNumWin = pred.nums.includes(actNum);
+            
+            let statusText = "LOSS";
+            let statusClass = "status-loss";
+            if (isNumWin) {
+                statusText = "NUMBER WIN";
+                statusClass = "status-num-win";
+                totalWins++;
+            } else if (isSizeWin) {
+                statusText = "WIN";
+                statusClass = "status-win";
+                totalWins++;
+            } else {
+                totalLoss++;
+            }
+            
+            // স্ট্যাটস আপডেট
+            document.getElementById('total-win').innerText = totalWins;
+            document.getElementById('total-loss').innerText = totalLoss;
+            const rate = Math.round((totalWins / (totalWins + totalLoss)) * 100) || 0;
+            document.getElementById('win-rate').innerText = rate + "%";
+            
+            // টেবিলে নতুন রো যোগ করুন (উপর থেকে)
+            const periodShort = latest.issueNumber.slice(-4);
+            const resultText = `${actSide} (${actNum})`;
+            const row = `<tr>
+                <td>#${periodShort}</td>
+                <td>${resultText}</td>
+                <td class="${statusClass}">${statusText}</td>
+            </table>`;
+            const tbody = document.getElementById('history-body');
+            tbody.insertAdjacentHTML('afterbegin', row);
+            
+            // সর্বোচ্চ 20টি এন্ট্রি রাখুন
+            if (tbody.children.length > 20) tbody.removeChild(tbody.lastChild);
+        }
+        
+        // API থেকে ডাটা ফেচ
+        async function fetchSystem() {
+            try {
+                const r = await fetch(`https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageNo=1&pageSize=10&ts=${Date.now()}`);
+                const j = await r.json();
+                const latest = j.data.list[0];
+                const nextIssue = (BigInt(latest.issueNumber) + 1n).toString();
+                document.getElementById('period-display').innerText = nextIssue;
+                
+                if (latest.issueNumber !== lastP) {
+                    if (currentP) processResult(latest, currentP);
+                    lastP = latest.issueNumber;
+                    const pred = getPrediction(j.data.list);
+                    currentP = { p: nextIssue, ...pred };
+                    // UI আপডেট
+                    document.getElementById('ai-res').innerText = pred.side;
+                    document.getElementById('ai-res').style.color = pred.side === "BIG" ? "var(--matrix-green)" : "var(--gold)";
+                    document.getElementById('num-row').innerHTML = `<div class="num-slot">${pred.nums[0]}</div><div class="num-slot">${pred.nums[1]}</div>`;
+                }
+            } catch(e) { console.warn("API fetch error:", e); }
+        }
+        
+        // টাইমার (30 সেকেন্ড কাউন্টডাউন)
+        setInterval(() => {
+            const s = new Date().getSeconds();
+            const rem = 30 - (s % 30);
+            document.getElementById('timer-val').innerText = `00:${rem < 10 ? '0'+rem : rem}`;
+            if (rem === 29 || rem === 1) fetchSystem();
+        }, 1000);
+        
+        // প্রথমবার কল
+        fetchSystem();
+    }
+    
+    // প্রাথমিকভাবে পাসওয়ার্ড লক দেখাবে, main-content লুকানো থাকবে
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('pass-input').focus();
+</script>
+
+</body>
+</html>
